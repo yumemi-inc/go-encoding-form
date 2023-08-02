@@ -55,15 +55,24 @@ func MarshalForm(v any) ([]byte, error) {
 			bytes = append(bytes, '&')
 		}
 
-		bytes = append(bytes, []byte(name)...)
-		bytes = append(bytes, byte('='))
+		if rv.Kind() == reflect.Struct {
+			valueBytes, err := MarshalForm(rv.Interface())
+			if err != nil {
+				return nil, err
+			}
 
-		valueBytes, err := MarshalFormValue(rv.Interface())
-		if err != nil {
-			return nil, err
+			bytes = append(bytes, valueBytes...)
+		} else {
+			bytes = append(bytes, []byte(name)...)
+			bytes = append(bytes, byte('='))
+
+			valueBytes, err := MarshalFormValue(rv.Interface())
+			if err != nil {
+				return nil, err
+			}
+
+			bytes = append(bytes, valueBytes...)
 		}
-
-		bytes = append(bytes, valueBytes...)
 	}
 
 	return bytes, nil
@@ -86,46 +95,46 @@ func MarshalFormValue(v any) ([]byte, error) {
 		return MarshalFormValue(reflect.ValueOf(v).Elem().Interface())
 
 	case reflect.Bool:
-		return []byte(strconv.FormatBool(v.(bool))), nil
+		return []byte(strconv.FormatBool(rv.Bool())), nil
 
 	case reflect.Int:
-		return []byte(strconv.Itoa(v.(int))), nil
+		return []byte(strconv.Itoa(int(rv.Int()))), nil
 
 	case reflect.Int8:
-		return []byte(strconv.Itoa(int(v.(int8)))), nil
+		return []byte(strconv.Itoa(int(rv.Int()))), nil
 
 	case reflect.Int16:
-		return []byte(strconv.Itoa(int(v.(int16)))), nil
+		return []byte(strconv.Itoa(int(rv.Int()))), nil
 
 	case reflect.Int32:
-		return []byte(strconv.FormatInt(int64(v.(int32)), 10)), nil
+		return []byte(strconv.FormatInt(rv.Int(), 10)), nil
 
 	case reflect.Int64:
-		return []byte(strconv.FormatInt(v.(int64), 10)), nil
+		return []byte(strconv.FormatInt(rv.Int(), 10)), nil
 
 	case reflect.Uint:
-		return []byte(strconv.FormatUint(uint64(v.(uint)), 10)), nil
+		return []byte(strconv.FormatUint(rv.Uint(), 10)), nil
 
 	case reflect.Uint8:
-		return []byte(strconv.Itoa(int(v.(uint8)))), nil
+		return []byte(strconv.Itoa(int(rv.Uint()))), nil
 
 	case reflect.Uint16:
-		return []byte(strconv.Itoa(int(v.(uint16)))), nil
+		return []byte(strconv.Itoa(int(rv.Uint()))), nil
 
 	case reflect.Uint32:
-		return []byte(strconv.FormatUint(uint64(v.(uint32)), 10)), nil
+		return []byte(strconv.FormatUint(rv.Uint(), 10)), nil
 
 	case reflect.Uint64:
-		return []byte(strconv.FormatUint(v.(uint64), 10)), nil
+		return []byte(strconv.FormatUint(rv.Uint(), 10)), nil
 
 	case reflect.Float32:
-		return []byte(strconv.FormatFloat(float64(v.(float32)), 'G', -1, 32)), nil
+		return []byte(strconv.FormatFloat(rv.Float(), 'G', -1, 32)), nil
 
 	case reflect.Float64:
-		return []byte(strconv.FormatFloat(v.(float64), 'G', -1, 64)), nil
+		return []byte(strconv.FormatFloat(rv.Float(), 'G', -1, 64)), nil
 
 	case reflect.String:
-		return []byte(url.QueryEscape(v.(string))), nil
+		return []byte(url.QueryEscape(rv.String())), nil
 	}
 
 	return nil, ErrUnknownType

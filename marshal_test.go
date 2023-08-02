@@ -8,26 +8,37 @@ import (
 )
 
 func TestMarshalForm(t *testing.T) {
+	type newType string
+
+	type inner struct {
+		Baz bool `form:"baz"`
+	}
+
 	type values struct {
-		Foo string `form:"foo"`
-		Bar *int64 `form:"bar,omitempty"`
+		Inner inner
+
+		Foo     string  `form:"foo"`
+		Bar     *int64  `form:"bar,omitempty"`
+		NewType newType `form:"new_type"`
 	}
 
 	v := values{
-		Foo: "testing",
-		Bar: nil,
+		Foo:     "testing",
+		Bar:     nil,
+		NewType: "foo",
 	}
 
 	bytes, err := MarshalForm(v)
 	require.NoError(t, err)
-	assert.Equal(t, []byte("foo=testing"), bytes)
+	assert.Equal(t, []byte("baz=false&foo=testing&new_type=foo"), bytes)
 
 	i := int64(123)
+	v.Inner.Baz = true
 	v.Bar = &i
 	bytes, err = MarshalForm(v)
 
 	require.NoError(t, err)
-	assert.Equal(t, []byte("foo=testing&bar=123"), bytes)
+	assert.Equal(t, []byte("baz=true&foo=testing&bar=123&new_type=foo"), bytes)
 }
 
 func TestMarshalFormValue(t *testing.T) {
