@@ -8,6 +8,8 @@ import (
 )
 
 func TestUnmarshalForm(t *testing.T) {
+	type newType string
+
 	type inner struct {
 		Baz bool `form:"baz"`
 	}
@@ -15,16 +17,18 @@ func TestUnmarshalForm(t *testing.T) {
 	type values struct {
 		Inner inner
 
-		Foo string `form:"foo"`
-		Bar *int64 `form:"bar"`
+		Foo     string  `form:"foo"`
+		Bar     *int64  `form:"bar"`
+		NewType newType `form:"new_type,omitempty"`
 	}
 
 	v := new(values)
-	err := UnmarshalForm([]byte("foo=testing&bar=123&baz=true"), v)
+	err := UnmarshalForm([]byte("foo=testing&bar=123&baz=true&new_type=foo"), v)
 	require.NoError(t, err)
 	assert.Equal(t, "testing", v.Foo)
 	assert.Equal(t, int64(123), *v.Bar)
 	assert.Equal(t, true, v.Inner.Baz)
+	assert.Equal(t, newType("foo"), v.NewType)
 }
 
 func TestUnmarshalFormValue(t *testing.T) {

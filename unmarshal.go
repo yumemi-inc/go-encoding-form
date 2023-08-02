@@ -138,7 +138,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*bool)) = b
+		rv.Elem().SetBool(b)
 
 	case reflect.Int:
 		i, err := strconv.Atoi(string(bytes))
@@ -146,7 +146,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*int)) = i
+		rv.Elem().SetInt(int64(i))
 
 	case reflect.Int8:
 		i, err := strconv.ParseInt(string(bytes), 10, 8)
@@ -154,7 +154,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*int8)) = int8(i)
+		rv.Elem().SetInt(i)
 
 	case reflect.Int16:
 		i, err := strconv.ParseInt(string(bytes), 10, 16)
@@ -162,7 +162,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*int16)) = int16(i)
+		rv.Elem().SetInt(i)
 
 	case reflect.Int32:
 		i, err := strconv.ParseInt(string(bytes), 10, 32)
@@ -170,7 +170,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*int32)) = int32(i)
+		rv.Elem().SetInt(i)
 
 	case reflect.Int64:
 		i, err := strconv.ParseInt(string(bytes), 10, 64)
@@ -178,7 +178,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*int64)) = i
+		rv.Elem().SetInt(i)
 
 	case reflect.Uint:
 		i, err := strconv.ParseUint(string(bytes), 10, 64)
@@ -186,7 +186,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*uint)) = uint(i)
+		rv.Elem().SetUint(i)
 
 	case reflect.Uint8:
 		i, err := strconv.ParseUint(string(bytes), 10, 8)
@@ -194,7 +194,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*uint8)) = uint8(i)
+		rv.Elem().SetUint(i)
 
 	case reflect.Uint16:
 		i, err := strconv.ParseUint(string(bytes), 10, 16)
@@ -202,7 +202,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*uint16)) = uint16(i)
+		rv.Elem().SetUint(i)
 
 	case reflect.Uint32:
 		i, err := strconv.ParseUint(string(bytes), 10, 32)
@@ -210,7 +210,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*uint32)) = uint32(i)
+		rv.Elem().SetUint(i)
 
 	case reflect.Uint64:
 		i, err := strconv.ParseUint(string(bytes), 10, 64)
@@ -218,7 +218,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*uint64)) = i
+		rv.Elem().SetUint(i)
 
 	case reflect.Float32:
 		f, err := strconv.ParseFloat(string(bytes), 32)
@@ -226,7 +226,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*float32)) = float32(f)
+		rv.Elem().SetFloat(f)
 
 	case reflect.Float64:
 		f, err := strconv.ParseFloat(string(bytes), 64)
@@ -234,7 +234,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*float64)) = f
+		rv.Elem().SetFloat(f)
 
 	case reflect.String:
 		s, err := url.QueryUnescape(string(bytes))
@@ -242,7 +242,7 @@ func UnmarshalFormValue(bytes []byte, v any) error {
 			return err
 		}
 
-		*(v.(*string)) = s
+		rv.Elem().SetString(s)
 
 	default:
 		return ErrUnknownType
