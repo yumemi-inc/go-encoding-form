@@ -9,7 +9,6 @@ import (
 
 var (
 	ErrNonNilPointerRequired = errors.New("a non-nil pointer is required")
-	ErrUnknownField          = errors.New("unknown field")
 )
 
 type ValueDenormalizer interface {
@@ -40,7 +39,7 @@ func Denormalize(data url.Values, v any) error {
 	for name := range data {
 		fieldValue, tag := findFieldInStruct(ty, rv, name)
 		if fieldValue == nil {
-			return ErrUnknownField
+			continue
 		}
 
 		switch fieldValue.Kind() {
