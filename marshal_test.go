@@ -38,7 +38,7 @@ func TestMarshalForm(t *testing.T) {
 	bytes, err = MarshalForm(v)
 
 	require.NoError(t, err)
-	assert.Equal(t, []byte("baz=true&foo=testing&bar=123&new_type=foo"), bytes)
+	assert.Equal(t, []byte("bar=123&baz=true&foo=testing&new_type=foo"), bytes)
 }
 
 func TestMarshalFormValue(t *testing.T) {
