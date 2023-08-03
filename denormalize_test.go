@@ -18,9 +18,11 @@ func TestDenormalize(t *testing.T) {
 	type values struct {
 		Inner inner
 
-		Foo     string  `form:"foo"`
-		Bar     *int64  `form:"bar"`
-		NewType newType `form:"new_type,omitempty"`
+		Foo     string   `form:"foo"`
+		Bar     *int64   `form:"bar"`
+		NewType newType  `form:"new_type,omitempty"`
+		Slice   []string `form:"slice"`
+		Array   [2]int   `form:"array"`
 	}
 
 	data := url.Values{}
@@ -28,6 +30,10 @@ func TestDenormalize(t *testing.T) {
 	data.Set("bar", "123")
 	data.Set("baz", "true")
 	data.Set("new_type", "foo")
+	data.Add("slice", "abc")
+	data.Add("slice", "def")
+	data.Add("array", "123")
+	data.Add("array", "456")
 
 	v := new(values)
 	err := Denormalize(data, v)

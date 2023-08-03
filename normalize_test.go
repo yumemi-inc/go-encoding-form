@@ -17,15 +17,18 @@ func TestNormalizeForm(t *testing.T) {
 	type values struct {
 		Inner inner
 
-		Foo     string  `form:"foo"`
-		Bar     *int64  `form:"bar,omitempty"`
-		NewType newType `form:"new_type"`
+		Foo     string   `form:"foo"`
+		Bar     *int64   `form:"bar,omitempty"`
+		NewType newType  `form:"new_type"`
+		Slice   []string `form:"slice"`
+		Array   [2]int   `form:"array"`
 	}
 
 	v := values{
 		Foo:     "testing",
 		Bar:     nil,
 		NewType: "foo",
+		Slice:   []string{},
 	}
 
 	actual, err := Normalize(v)
@@ -33,11 +36,15 @@ func TestNormalizeForm(t *testing.T) {
 	assert.Equal(t, "false", actual.Get("baz"))
 	assert.Equal(t, "testing", actual.Get("foo"))
 	assert.Equal(t, "foo", actual.Get("new_type"))
+	assert.Equal(t, []string{"0", "0"}, actual["array"])
 	assert.Empty(t, actual.Get("bar"))
+	assert.Empty(t, actual["slice"])
 
 	i := int64(123)
 	v.Inner.Baz = true
 	v.Bar = &i
+	v.Slice = []string{"abc", "def"}
+	v.Array = [2]int{123, 456}
 	actual, err = Normalize(v)
 
 	require.NoError(t, err)
@@ -45,6 +52,8 @@ func TestNormalizeForm(t *testing.T) {
 	assert.Equal(t, "testing", actual.Get("foo"))
 	assert.Equal(t, "123", actual.Get("bar"))
 	assert.Equal(t, "foo", actual.Get("new_type"))
+	assert.Equal(t, []string{"abc", "def"}, actual["slice"])
+	assert.Equal(t, []string{"123", "456"}, actual["array"])
 }
 
 func TestNormalizeFormValue(t *testing.T) {

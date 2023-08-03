@@ -9,7 +9,6 @@ import (
 
 var (
 	ErrNonNilPointerRequired = errors.New("a non-nil pointer is required")
-	ErrSliceNotSupported     = errors.New("slices are not supported yet")
 	ErrUnknownField          = errors.New("unknown field")
 )
 
@@ -38,15 +37,28 @@ func Denormalize(data url.Values, v any) error {
 		return ErrUnknownType
 	}
 
-	for name, values := range data {
+	for name := range data {
 		fieldValue, tag := findFieldInStruct(ty, rv, name)
 		if fieldValue == nil {
 			return ErrUnknownField
 		}
 
-		if len(values) == 1 {
-			value := values[0]
+		switch fieldValue.Kind() {
+		case reflect.Slice:
+			values := data[name]
+			fieldValue.Set(reflect.MakeSlice(fieldValue.Type(), len(values), len(values)))
 
+			fallthrough
+
+		case reflect.Array:
+			for i, value := range data[name] {
+				if err := DenormalizeFormValue(value, fieldValue.Index(i).Addr().Interface()); err != nil {
+					return err
+				}
+			}
+
+		default:
+			value := data.Get(name)
 			if len(value) > 0 || !tag.OmitEmpty {
 				if fieldValue.Kind() == reflect.Pointer && fieldValue.IsNil() {
 					fieldValue.Set(reflect.New(fieldValue.Type().Elem()))
@@ -56,8 +68,6 @@ func Denormalize(data url.Values, v any) error {
 					return err
 				}
 			}
-		} else {
-			return ErrSliceNotSupported
 		}
 	}
 

@@ -45,7 +45,8 @@ func Normalize(v any) (url.Values, error) {
 			continue
 		}
 
-		if rv.Kind() == reflect.Struct {
+		switch rv.Kind() {
+		case reflect.Struct:
 			nestedValues, err := Normalize(rv.Interface())
 			if err != nil {
 				return nil, err
@@ -56,7 +57,18 @@ func Normalize(v any) (url.Values, error) {
 					values.Add(name, v)
 				}
 			}
-		} else {
+
+		case reflect.Slice, reflect.Array:
+			for i := 0; i < rv.Len(); i++ {
+				value, err := NormalizeFormValue(rv.Index(i).Interface())
+				if err != nil {
+					return nil, err
+				}
+
+				values.Add(name, value)
+			}
+
+		default:
 			value, err := NormalizeFormValue(rv.Interface())
 			if err != nil {
 				return nil, err
